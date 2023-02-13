@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import "./App.css";
 import { Auth } from "./components/auth";
+import { onAuthStateChanged } from "firebase/auth";
 import { db, auth } from "./config/firebase";
 import {
   getDocs,
@@ -8,6 +9,8 @@ import {
   addDoc,
   deleteDoc,
   doc,
+  query,
+  where,
 } from "firebase/firestore";
 
 function App() {
@@ -18,26 +21,44 @@ function App() {
   const [BookPages, setBookPages] = useState(0);
   const [BookRead, setBookRead] = useState(false);
 
+  const [currUsername, setCurrUsername] = useState("");
+
+  useEffect(() => {
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+        setCurrUsername(user.displayName);
+        getBooksFromDb();
+      } else {
+        setCurrUsername("");
+      }
+    });
+  }, []);
+
   const booksCollectionRef = collection(db, "books");
 
   async function getBooksFromDb() {
     try {
-      const data = await getDocs(booksCollectionRef);
-      const filteredData = data.docs.map((doc) => ({
+      const q = query(
+        booksCollectionRef,
+        where("userId", "==", auth.currentUser.uid)
+      );
+      const querySnapshot = await getDocs(q);
+      const filteredData = querySnapshot.docs.map((doc) => ({
         ...doc.data(),
         id: doc.id,
       }));
       setBookList(filteredData);
     } catch (error) {
-      console.error(error); 
+      console.error(error);
     }
   }
 
   useEffect(() => {
     getBooksFromDb();
-  });
+  }, []);
 
-  async function submitBook() {
+  async function submitBook(e) {
+    e.preventDefault();
     try {
       await addDoc(booksCollectionRef, {
         title: BookTitle,
@@ -54,35 +75,44 @@ function App() {
 
   async function deleteBook(id) {
     const bookDoc = doc(db, "books", id);
-    await deleteDoc(bookDoc);
-    getBooksFromDb();
+    try {
+      await deleteDoc(bookDoc);
+      getBooksFromDb();
+    } catch (error) {
+      console.error(error);
+    }
   }
 
   return (
     <div className="app">
-      <Auth />
+      <Auth currUsername={currUsername} />
       <div>
-        <input
-          placeholder="title"
-          onChange={(e) => setBookTitle(e.target.value)}
-        />
-        <input
-          placeholder="author"
-          onChange={(e) => setBookAuthor(e.target.value)}
-        />
-        <input
-          placeholder="pages"
-          type="number"
-          onChange={(e) => setBookPages(+e.target.value)}
-        />
-        <label>
-          read?
+        <form onSubmit={submitBook}>
           <input
-            type="checkbox"
-            onChange={(e) => setBookRead(e.target.checked)}
+            placeholder="title"
+            onChange={(e) => setBookTitle(e.target.value)}
+            required
           />
-        </label>
-        <button onClick={submitBook}>add book</button>
+          <input
+            placeholder="author"
+            onChange={(e) => setBookAuthor(e.target.value)}
+            required
+          />
+          <input
+            placeholder="pages"
+            type="number"
+            onChange={(e) => setBookPages(+e.target.value)}
+            required
+          />
+          <label>
+            read?
+            <input
+              type="checkbox"
+              onChange={(e) => setBookRead(e.target.checked)}
+            />
+          </label>
+          <button>add book</button>
+        </form>
       </div>
       <div>
         {bookList.map((book) => (

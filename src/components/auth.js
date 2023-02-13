@@ -1,15 +1,12 @@
 import { auth, googleProvider } from "../config/firebase";
 import { signInWithPopup, signOut } from "firebase/auth";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
-export function Auth() {
-  const [currUsername, setCurrUsername] = useState("");
-
+export function Auth({ currUsername }) {
   async function signInWithGoogle() {
     try {
       await signInWithPopup(auth, googleProvider);
       console.log("signed in");
-      setCurrUsername(auth?.currentUser?.displayName);
     } catch (error) {
       console.error(error);
     }
@@ -19,7 +16,6 @@ export function Auth() {
     try {
       await signOut(auth);
       console.log("signed out");
-      setCurrUsername("")
     } catch (error) {
       console.error(error);
     }
