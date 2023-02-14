@@ -1,8 +1,7 @@
 import React, { useEffect, useState } from "react";
 import "./App.css";
-import { Auth } from "./components/auth";
 import { onAuthStateChanged } from "firebase/auth";
-import { db, auth } from "./config/firebase";
+import { db, auth } from "./firebase";
 import {
   getDocs,
   collection,
@@ -12,6 +11,9 @@ import {
   query,
   where,
 } from "firebase/firestore";
+import Auth from "./components/Auth";
+import BookList from "./components/BookList";
+import BookForm from "./components/BookForm";
 
 function App() {
   const [bookList, setBookList] = useState([]);
@@ -30,6 +32,7 @@ function App() {
         getBooksFromDb();
       } else {
         setCurrUsername("");
+        setBookList([])
       }
     });
   }, []);
@@ -53,9 +56,9 @@ function App() {
     }
   }
 
-  useEffect(() => {
-    getBooksFromDb();
-  }, []);
+  // useEffect(() => {
+  //   getBooksFromDb();
+  // }, []);
 
   async function submitBook(e) {
     e.preventDefault();
@@ -86,45 +89,14 @@ function App() {
   return (
     <div className="app">
       <Auth currUsername={currUsername} />
-      <div>
-        <form onSubmit={submitBook}>
-          <input
-            placeholder="title"
-            onChange={(e) => setBookTitle(e.target.value)}
-            required
-          />
-          <input
-            placeholder="author"
-            onChange={(e) => setBookAuthor(e.target.value)}
-            required
-          />
-          <input
-            placeholder="pages"
-            type="number"
-            onChange={(e) => setBookPages(+e.target.value)}
-            required
-          />
-          <label>
-            read?
-            <input
-              type="checkbox"
-              onChange={(e) => setBookRead(e.target.checked)}
-            />
-          </label>
-          <button>add book</button>
-        </form>
-      </div>
-      <div>
-        {bookList.map((book) => (
-          <div key={book.id}>
-            <h1>{book.title}</h1>
-            <h3>{book.author}</h3>
-            <p>{book.read ? "read" : "not read"}</p>
-            <p>{book.pages}</p>
-            <button onClick={() => deleteBook(book.id)}>delete book</button>
-          </div>
-        ))}
-      </div>
+      <BookForm
+        submitBook={submitBook}
+        setBookTitle={setBookTitle}
+        setBookAuthor={setBookAuthor}
+        setBookPages={setBookPages}
+        setBookRead={setBookRead}
+      />
+      <BookList bookList={bookList} deleteBook={deleteBook} />
     </div>
   );
 }

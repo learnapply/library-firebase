@@ -1,8 +1,7 @@
-import { auth, googleProvider } from "../config/firebase";
+import { auth, googleProvider } from "../firebase";
 import { signInWithPopup, signOut } from "firebase/auth";
-import { useState, useEffect } from "react";
 
-export function Auth({ currUsername }) {
+function Auth({ currUsername }) {
   async function signInWithGoogle() {
     try {
       await signInWithPopup(auth, googleProvider);
@@ -22,7 +21,7 @@ export function Auth({ currUsername }) {
   }
 
   return (
-    <div>
+    <div className="auth-container">
       <button onClick={signInWithGoogle}>Sign-in with Google</button>
       <button onClick={signout}>Sign out</button>
       <div>
@@ -31,3 +30,5 @@ export function Auth({ currUsername }) {
     </div>
   );
 }
+
+export default Auth;
