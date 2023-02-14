@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import "./App.css";
 import { onAuthStateChanged } from "firebase/auth";
 import { db, auth } from "./firebase";
@@ -18,28 +18,29 @@ import BookForm from "./components/BookForm";
 function App() {
   const [bookList, setBookList] = useState([]);
 
-  const [BookTitle, setBookTitle] = useState("");
-  const [BookAuthor, setBookAuthor] = useState("");
-  const [BookPages, setBookPages] = useState(0);
-  const [BookRead, setBookRead] = useState(false);
+  const [bookTitle, setBookTitle] = useState("");
+  const [bookAuthor, setBookAuthor] = useState("");
+  const [bookPages, setBookPages] = useState(0);
+  const [bookRead, setBookRead] = useState(false);
 
   const [currUsername, setCurrUsername] = useState("");
 
   useEffect(() => {
-    onAuthStateChanged(auth, (user) => {
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
       if (user) {
         setCurrUsername(user.displayName);
         getBooksFromDb();
       } else {
         setCurrUsername("");
-        setBookList([])
+        setBookList([]);
       }
     });
+    return unsubscribe;
   }, []);
 
   const booksCollectionRef = collection(db, "books");
 
-  async function getBooksFromDb() {
+  const getBooksFromDb = useCallback(async () => {
     try {
       const q = query(
         booksCollectionRef,
@@ -54,29 +55,35 @@ function App() {
     } catch (error) {
       console.error(error);
     }
-  }
+  }, [booksCollectionRef]);
 
-  // useEffect(() => {
-  //   getBooksFromDb();
-  // }, []);
+  const submitBook = useCallback(
+    async (e) => {
+      e.preventDefault();
+      try {
+        await addDoc(booksCollectionRef, {
+          title: bookTitle,
+          author: bookAuthor,
+          pages: bookPages,
+          read: bookRead,
+          userId: auth.currentUser.uid,
+        });
+        getBooksFromDb();
+      } catch (error) {
+        console.error(error);
+      }
+    },
+    [
+      booksCollectionRef,
+      bookTitle,
+      bookAuthor,
+      bookPages,
+      bookRead,
+      getBooksFromDb,
+    ]
+  );
 
-  async function submitBook(e) {
-    e.preventDefault();
-    try {
-      await addDoc(booksCollectionRef, {
-        title: BookTitle,
-        author: BookAuthor,
-        pages: BookPages,
-        read: BookRead,
-        userId: auth.currentUser.uid,
-      });
-      getBooksFromDb();
-    } catch (error) {
-      console.error(error);
-    }
-  }
-
-  async function deleteBook(id) {
+  const deleteBook = useCallback(async (id) => {
     const bookDoc = doc(db, "books", id);
     try {
       await deleteDoc(bookDoc);
@@ -84,7 +91,7 @@ function App() {
     } catch (error) {
       console.error(error);
     }
-  }
+  }, []);
 
   return (
     <div className="app">
