@@ -4,6 +4,8 @@ import { signInWithPopup, signOut } from "firebase/auth";
 import { useState } from "react";
 
 function Auth({ currUsername }) {
+  // somehow sign in state is reset to false everytime 
+  // page reloads, need to get the state from app or backend
   const [loggedIn, setLoggedIn] = useState(false);
 
   async function signInWithGoogle() {
@@ -41,12 +43,11 @@ function Auth({ currUsername }) {
 export default Auth;
 
 const Container = styled.div`
-  padding: 2rem;
-  border: 2px solid red;
+
 `;
 
 const Button = styled.button``;
 
 const CurrentUsername = styled.h3`
-  color: ${({ theme }) => theme.colors.main};
-`;
+  color: black;
+`

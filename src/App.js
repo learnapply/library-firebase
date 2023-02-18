@@ -11,9 +11,10 @@ import {
   query,
   where,
 } from "firebase/firestore";
-import Auth from "./components/Auth";
+import Header from "./components/Header";
 import BookList from "./components/BookList";
-import BookForm from "./components/BookForm";
+import Modal from "./components/Modal";
+import styled from "styled-components";
 
 function App() {
   const [bookList, setBookList] = useState([]);
@@ -25,10 +26,13 @@ function App() {
 
   const [currUsername, setCurrUsername] = useState("");
 
+  const [isModalOpen, setIsModalOpen] = useState(false)
+
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       if (user) {
         setCurrUsername(user.displayName);
+        console.log(user.displayName)
         getBooksFromDb();
       } else {
         setCurrUsername("");
@@ -94,9 +98,12 @@ function App() {
   }, []);
 
   return (
-    <div className="app">
-      <Auth currUsername={currUsername} />
-      <BookForm
+    <>
+      <Header currUsername={currUsername}/>
+      <AddBook onClick={() => setIsModalOpen(true)}>Add book</AddBook>
+      <Modal
+        isModalOpen={isModalOpen}
+        setIsModalOpen={setIsModalOpen}
         submitBook={submitBook}
         setBookTitle={setBookTitle}
         setBookAuthor={setBookAuthor}
@@ -104,8 +111,12 @@ function App() {
         setBookRead={setBookRead}
       />
       <BookList bookList={bookList} deleteBook={deleteBook} />
-    </div>
+    </>
   );
 }
 
 export default App;
+
+const AddBook = styled.button`
+  padding: 1rem;
+`
