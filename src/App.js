@@ -32,7 +32,6 @@ function App() {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       if (user) {
         setCurrUsername(user.displayName);
-        console.log(user.displayName)
         getBooksFromDb();
       } else {
         setCurrUsername("");

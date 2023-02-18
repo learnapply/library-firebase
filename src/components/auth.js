@@ -1,17 +1,12 @@
 import styled from "styled-components";
 import { auth, googleProvider } from "../firebase";
 import { signInWithPopup, signOut } from "firebase/auth";
-import { useState } from "react";
 
 function Auth({ currUsername }) {
-  // somehow sign in state is reset to false everytime 
-  // page reloads, need to get the state from app or backend
-  const [loggedIn, setLoggedIn] = useState(false);
 
   async function signInWithGoogle() {
     try {
       await signInWithPopup(auth, googleProvider);
-      setLoggedIn(true);
     } catch (error) {
       console.error(error);
     }
@@ -20,7 +15,6 @@ function Auth({ currUsername }) {
   async function signout() {
     try {
       await signOut(auth);
-      setLoggedIn(false);
     } catch (error) {
       console.error(error);
     }
@@ -28,12 +22,14 @@ function Auth({ currUsername }) {
 
   return (
     <Container>
-      {loggedIn ? (
-        <Button onClick={signout}>Sign out</Button>
+      {currUsername ? (
+        <Profile>
+          <CurrentUsername>{currUsername}</CurrentUsername>
+          <Button onClick={signout}>Sign out</Button>
+        </Profile>
       ) : (
         <>
           <Button onClick={signInWithGoogle}>Sign-in with Google</Button>
-          <CurrentUsername>{currUsername}</CurrentUsername>
         </>
       )}
     </Container>
@@ -42,12 +38,15 @@ function Auth({ currUsername }) {
 
 export default Auth;
 
-const Container = styled.div`
+const Container = styled.div``;
 
-`;
+const Profile = styled.div`
+  display: flex;
+  gap: 1rem;
+`
 
 const Button = styled.button``;
 
 const CurrentUsername = styled.h3`
   color: black;
-`
+`;
