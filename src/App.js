@@ -1,5 +1,4 @@
 import React, { useEffect, useState, useCallback } from "react";
-import "./App.css";
 import { onAuthStateChanged } from "firebase/auth";
 import { db, auth } from "./firebase";
 import {
@@ -12,7 +11,7 @@ import {
   where,
 } from "firebase/firestore";
 import Header from "./components/Header";
-import BookList from "./components/BookList";
+import BookCards from "./components/BookCards";
 import Modal from "./components/Modal";
 import styled from "styled-components";
 
@@ -24,17 +23,17 @@ function App() {
   const [bookPages, setBookPages] = useState(0);
   const [bookRead, setBookRead] = useState(false);
 
-  const [currUsername, setCurrUsername] = useState("");
+  const [currUser, setCurrUser] = useState(null);
 
   const [isModalOpen, setIsModalOpen] = useState(false)
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       if (user) {
-        setCurrUsername(user.displayName);
+        setCurrUser(user);
         getBooksFromDb();
       } else {
-        setCurrUsername("");
+        setCurrUser(null);
         setBookList([]);
       }
     });
@@ -98,8 +97,7 @@ function App() {
 
   return (
     <>
-      <Header currUsername={currUsername}/>
-      <AddBook onClick={() => setIsModalOpen(true)}>Add book</AddBook>
+      <Header currUser={currUser}/>
       <Modal
         isModalOpen={isModalOpen}
         setIsModalOpen={setIsModalOpen}
@@ -109,7 +107,7 @@ function App() {
         setBookPages={setBookPages}
         setBookRead={setBookRead}
       />
-      <BookList bookList={bookList} deleteBook={deleteBook} />
+      <BookCards bookList={bookList} deleteBook={deleteBook} setIsModalOpen={setIsModalOpen} />
     </>
   );
 }

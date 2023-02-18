@@ -2,8 +2,7 @@ import styled from "styled-components";
 import { auth, googleProvider } from "../firebase";
 import { signInWithPopup, signOut } from "firebase/auth";
 
-function Auth({ currUsername }) {
-
+function Auth({ currUser }) {
   async function signInWithGoogle() {
     try {
       await signInWithPopup(auth, googleProvider);
@@ -22,9 +21,10 @@ function Auth({ currUsername }) {
 
   return (
     <Container>
-      {currUsername ? (
+      {currUser ? (
         <Profile>
-          <CurrentUsername>{currUsername}</CurrentUsername>
+          <ProfileImg src={currUser.photoURL} alt="profile picture" />
+          <CurrentUsername>{currUser.displayName}</CurrentUsername>
           <Button onClick={signout}>Sign out</Button>
         </Profile>
       ) : (
@@ -42,8 +42,17 @@ const Container = styled.div``;
 
 const Profile = styled.div`
   display: flex;
+  justify-content: center;
+  align-items: center;
   gap: 1rem;
-`
+`;
+
+const ProfileImg = styled.img`
+  width: 40px;
+  border-radius: 50%;
+`;
+
+
 
 const Button = styled.button``;
 

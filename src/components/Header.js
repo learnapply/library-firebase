@@ -2,11 +2,11 @@ import React from 'react'
 import styled from 'styled-components'
 import Auth from './Auth'
 
-function Header({currUsername}) {
+function Header({currUser}) {
   return (
     <Container>
       <h1>library.</h1>
-      <Auth currUsername={currUsername} />
+      <Auth currUser={currUser} />
     </Container>
   )
 }
@@ -19,5 +19,5 @@ const Container = styled.div`
   align-items: center;
   background-color: lightcoral;
   color: black;
-  padding: 1rem;
+  padding: 1rem 3rem;
 `
