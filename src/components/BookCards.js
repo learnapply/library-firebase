@@ -1,32 +1,45 @@
-import React from 'react'
-import styled from 'styled-components'
+import React from "react";
+import styled from "styled-components";
 
-function BookList({bookList, deleteBook, setIsModalOpen}) {
+function BookList({ bookList, deleteBook, updateBook, setIsModalOpen }) {
   return (
     <Container>
-    {bookList.map((book) => (
-      <BookCard key={book.id}>
-        <p>{book.title}</p>
-        <p><em>by</em> {book.author}</p>
-        <p>{book.pages} <em>pages</em> </p>
-        <p>{book.read ? "read" : "not read"}</p>
-        <DeleteBook onClick={() => deleteBook(book.id)}>delete book</DeleteBook>
-      </BookCard>
-      
-    ))}
-    <AddBook onClick={() => setIsModalOpen(true)}> + </AddBook>
-  </Container>
-  )
+      {bookList ? (
+        <>
+          {bookList.map((book) => (
+            <BookCard key={book.id}>
+              <p>{book.title}</p>
+              <p>
+                <em>by</em> {book.author}
+              </p>
+              <p>
+                {book.pages} <em>pages</em>{" "}
+              </p>
+              <p onClick={() => updateBook(book.id, book.read)}>
+                {book.read ? "read" : "not read"}
+              </p>
+              <DeleteBook onClick={() => deleteBook(book.id)}>
+                delete book
+              </DeleteBook>
+            </BookCard>
+          ))}
+          <AddBook onClick={() => setIsModalOpen(true)}> + </AddBook>
+        </>
+      ) : (
+        <>please sign in too see your books</>
+      )}
+    </Container>
+  );
 }
 
-export default BookList
+export default BookList;
 
 const Container = styled.div`
   margin: 4rem;
   display: flex;
   gap: 1rem;
   flex-wrap: wrap;
-`
+`;
 
 const BookCard = styled.div`
   font-size: 1.1rem;
@@ -35,7 +48,8 @@ const BookCard = styled.div`
   margin: 1rem;
   display: flex;
   flex-direction: column;
-  background-color: ${({theme}) => theme.colors.card};
+  align-items: flex-start;
+  background-color: ${({ theme }) => theme.colors.card};
   box-shadow: rgba(100, 100, 111, 0.2) 0px 7px 29px 0px;
   border-radius: 5px;
   width: 300px;
@@ -44,8 +58,11 @@ const BookCard = styled.div`
   position: relative;
   > p:nth-child(4) {
     color: purple;
+    &:hover {
+      cursor: pointer;
+    }
   }
-`
+`;
 
 const DeleteBook = styled.p`
   position: absolute;
@@ -53,10 +70,10 @@ const DeleteBook = styled.p`
   right: 1rem;
   font-weight: 100;
   color: purple;
-   &:hover {
-    cursor:pointer;
+  &:hover {
+    cursor: pointer;
   }
-`
+`;
 
 const AddBook = styled(BookCard)`
   user-select: none;
@@ -68,12 +85,12 @@ const AddBook = styled(BookCard)`
   align-items: center;
   transition: 0.2s;
   &:hover {
-    cursor:pointer;
+    cursor: pointer;
     transform: scale(1.03);
   }
 
   &:active {
-    cursor:pointer;
+    cursor: pointer;
     transform: scale(0.99);
   }
-`
+`;

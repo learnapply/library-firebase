@@ -6,6 +6,7 @@ import {
   collection,
   addDoc,
   deleteDoc,
+  updateDoc,
   doc,
   query,
   where,
@@ -16,7 +17,7 @@ import Modal from "./components/Modal";
 import styled from "styled-components";
 
 function App() {
-  const [bookList, setBookList] = useState([]);
+  const [bookList, setBookList] = useState(null);
 
   const [bookTitle, setBookTitle] = useState("");
   const [bookAuthor, setBookAuthor] = useState("");
@@ -25,7 +26,7 @@ function App() {
 
   const [currUser, setCurrUser] = useState(null);
 
-  const [isModalOpen, setIsModalOpen] = useState(false)
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
@@ -34,7 +35,7 @@ function App() {
         getBooksFromDb();
       } else {
         setCurrUser(null);
-        setBookList([]);
+        setBookList(null);
       }
     });
     return unsubscribe;
@@ -42,6 +43,7 @@ function App() {
 
   const booksCollectionRef = collection(db, "books");
 
+  // TODO: this can be improved so that it gets books automatically everytime something is updated
   const getBooksFromDb = useCallback(async () => {
     try {
       const q = query(
@@ -59,6 +61,8 @@ function App() {
     }
   }, [booksCollectionRef]);
 
+
+  // TODO: add and order by timestamp
   const submitBook = useCallback(
     async (e) => {
       e.preventDefault();
@@ -85,6 +89,18 @@ function App() {
     ]
   );
 
+  const updateBook = useCallback(async (id, readStatus) => {
+    const bookDoc = doc(db, "books", id);
+    try {
+      await updateDoc(bookDoc, {
+        read: !readStatus,
+      });
+      getBooksFromDb();
+    } catch (error) {
+      console.error(error);
+    }
+  }, []);
+
   const deleteBook = useCallback(async (id) => {
     const bookDoc = doc(db, "books", id);
     try {
@@ -97,7 +113,7 @@ function App() {
 
   return (
     <>
-      <Header currUser={currUser}/>
+      <Header currUser={currUser} />
       <Modal
         isModalOpen={isModalOpen}
         setIsModalOpen={setIsModalOpen}
@@ -107,7 +123,12 @@ function App() {
         setBookPages={setBookPages}
         setBookRead={setBookRead}
       />
-      <BookCards bookList={bookList} deleteBook={deleteBook} setIsModalOpen={setIsModalOpen} />
+      <BookCards
+        bookList={bookList}
+        deleteBook={deleteBook}
+        updateBook={updateBook}
+        setIsModalOpen={setIsModalOpen}
+      />
     </>
   );
 }
@@ -116,4 +137,4 @@ export default App;
 
 const AddBook = styled.button`
   padding: 1rem;
-`
+`;

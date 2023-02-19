@@ -15,18 +15,18 @@ function BookForm({
     <Overlay>
       <Container>
         <p onClick={() => setIsModalOpen(false)}>Close</p>
-        <form onSubmit={submitBook}>
-          <input
+        <Form onSubmit={submitBook}>
+          <Input
             placeholder="title"
             onChange={(e) => setBookTitle(e.target.value)}
             required
           />
-          <input
+          <Input
             placeholder="author"
             onChange={(e) => setBookAuthor(e.target.value)}
             required
           />
-          <input
+          <Input
             placeholder="pages"
             type="number"
             onChange={(e) => setBookPages(+e.target.value)}
@@ -34,13 +34,13 @@ function BookForm({
           />
           <label>
             read?
-            <input
+            <Input
               type="checkbox"
               onChange={(e) => setBookRead(e.target.checked)}
             />
           </label>
-          <button>add book</button>
-        </form>
+          <Button>add book</Button>
+        </Form>
       </Container>
     </Overlay>
   );
@@ -70,4 +70,31 @@ const Container = styled.div`
   justify-content: center;
   border: none;
   border-radius: 5px;
+`;
+
+const Form = styled.form`
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+`;
+
+const Input = styled.input`
+  padding: 16px 10px;
+  border-radius: 5px;
+  border: none;
+  box-shadow: rgba(0, 0, 0, 0.1) 0px 4px 6px -1px;
+  font-size: 16px;
+  font-weight: 900;
+`;
+
+const Button = styled.button`
+  width: 100%;
+  padding: 8px;
+  background-color: purple;
+  border: none;
+  border-radius: 5px;
+  font-size: large;
+  font-weight: bold;
+  color: white;
+  box-shadow: rgba(0, 0, 0, 0.1) 0px 4px 6px -1px;
 `;
